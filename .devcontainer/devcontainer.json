@@ -3,5 +3,5 @@
   "dockerComposeFile": "docker-compose.yml",
   "service": "app",
   "workspaceFolder": "/usr/share/nginx/html",
-  "updateContentCommand": "apk add --no-cache bash curl unzip nodejs npm && bash .devpanel/init.sh"
+  "updateContentCommand": "apk add --no-cache bash curl unzip nodejs bun && bash .devpanel/init.sh"
 }

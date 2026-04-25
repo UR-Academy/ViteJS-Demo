@@ -58,14 +58,10 @@ cat > index.html <<'EOF'
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DrupalForge Demo Template</title>
+    <title>DrupalForge Interactive Demo</title>
   </head>
   <body>
-    <main style="font-family: Arial, sans-serif; padding: 40px;">
-      <h1>DrupalForge Demo Template</h1>
-      <p>This demo page is running with Bun + Vite.</p>
-      <p>If you can see this page, nginx is serving the built static files correctly.</p>
-    </main>
+    <div id="app"></div>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>
@@ -74,18 +70,179 @@ EOF
 mkdir -p src
 
 cat > src/main.js <<'EOF'
-console.log("DrupalForge demo template loaded successfully.");
+import './style.css'
+
+const app = document.querySelector('#app')
+
+app.innerHTML = `
+  <main class="page">
+    <section class="hero">
+      <div class="badge">DrupalForge Demo Template</div>
+
+      <h1>Launch your app faster</h1>
+
+      <p>
+        This is a Bun + Vite demo running inside your DevPanel / DrupalForge
+        template test environment.
+      </p>
+
+      <div class="actions">
+        <button id="colorBtn">Change Theme</button>
+        <button id="countBtn">Click Counter: <span id="count">0</span></button>
+      </div>
+
+      <div class="card-grid">
+        <div class="card">
+          <h2>Fast setup</h2>
+          <p>Generated during template initialization.</p>
+        </div>
+        <div class="card">
+          <h2>Static hosting</h2>
+          <p>Built with Vite and served by nginx on port 80.</p>
+        </div>
+        <div class="card">
+          <h2>Ready to test</h2>
+          <p>Use this to verify purchase, deploy, and app access flow.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+`
+
+let count = 0
+let theme = 0
+
+const themes = [
+  ['#7c3aed', '#06b6d4'],
+  ['#f97316', '#ec4899'],
+  ['#16a34a', '#84cc16'],
+  ['#2563eb', '#9333ea']
+]
+
+document.querySelector('#countBtn').addEventListener('click', () => {
+  count++
+  document.querySelector('#count').textContent = count
+})
+
+document.querySelector('#colorBtn').addEventListener('click', () => {
+  theme = (theme + 1) % themes.length
+  document.documentElement.style.setProperty('--primary', themes[theme][0])
+  document.documentElement.style.setProperty('--secondary', themes[theme][1])
+})
 EOF
 
-cat > vite.config.js <<'EOF'
-import { defineConfig } from 'vite'
+cat > src/style.css <<'EOF'
+:root {
+  --primary: #7c3aed;
+  --secondary: #06b6d4;
+}
 
-export default defineConfig({
-  build: {
-    outDir: 'dist',
-    emptyOutDir: true
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, Arial, sans-serif;
+  color: white;
+  background:
+    radial-gradient(circle at top left, var(--secondary), transparent 35%),
+    linear-gradient(135deg, var(--primary), #111827 70%);
+  min-height: 100vh;
+}
+
+.page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 32px;
+}
+
+.hero {
+  width: min(960px, 100%);
+  padding: 48px;
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(14px);
+}
+
+.badge {
+  display: inline-block;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+h1 {
+  margin: 22px 0 12px;
+  font-size: clamp(40px, 7vw, 76px);
+  line-height: 0.95;
+}
+
+p {
+  font-size: 18px;
+  line-height: 1.6;
+  opacity: 0.9;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin: 28px 0;
+}
+
+button {
+  border: 0;
+  padding: 14px 20px;
+  border-radius: 14px;
+  color: #111827;
+  background: white;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin-top: 24px;
+}
+
+.card {
+  padding: 22px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.card h2 {
+  margin: 0 0 8px;
+}
+
+.card p {
+  margin: 0;
+  font-size: 15px;
+}
+
+@media (max-width: 760px) {
+  .hero {
+    padding: 28px;
   }
-})
+
+  .card-grid {
+    grid-template-columns: 1fr;
+  }
+}
 EOF
 
 echo
