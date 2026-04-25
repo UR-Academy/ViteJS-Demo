@@ -6,8 +6,8 @@ services:
     image: devpanel/php:8.5-base-rc
     environment:
       DP_APP_ID: 'drupalforge'
-      APP_ROOT: '/var/www/html'        
-      WEB_ROOT: '/var/www/html/web'
+      APP_ROOT: '/var/www/html'
+      WEB_ROOT: '/var/www/html'
       # Devcontainer-only unzip defaults for virtiofs metadata compatibility.
       UNZIPOPT: '-o -DD'
       CODES_USER_DATA_DIR: '/var/www/html/.vscode'
