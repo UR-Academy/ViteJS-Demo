@@ -1,7 +1,7 @@
 {
-    "name": "ViteJS Demo",
-    "dockerComposeFile": "docker-compose.yml",
-    "service": "app",
-    "workspaceFolder": "/usr/share/nginx/html",
-    "updateContentCommand": "bash .devpanel/init.sh"
+  "name": "ViteJS Demo",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/usr/share/nginx/html",
+  "updateContentCommand": "apk add --no-cache bash curl unzip nodejs npm && bash .devpanel/init.sh"
 }
