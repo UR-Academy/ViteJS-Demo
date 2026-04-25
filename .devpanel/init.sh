@@ -13,12 +13,10 @@ exec > >(tee "$LOG_FILE") 2>&1
 echo
 echo "Starting demo template setup..."
 
-# Remove root-owned files.
 echo
 echo "Remove root-owned files."
 sudo rm -rf lost+found || true
 
-# Install Bun if missing.
 echo
 echo "Install Bun if needed."
 if ! command -v bun >/dev/null 2>&1; then
@@ -30,17 +28,27 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 
 bun --version
 
-# Create Vite demo app.
 echo
-echo "Create Vite demo app."
+echo "Create Vite demo app files."
 
-if [ ! -f package.json ]; then
-  bun create vite . --template vanilla
-fi
+cat > package.json <<'EOF'
+{
+  "name": "drupalforge-vite-demo",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "vite",
+    "dev": "vite --host 0.0.0.0"
+  },
+  "dependencies": {
+    "@vitejs/plugin-basic-ssl": "^2.1.0",
+    "vite": "^7.0.0"
+  },
+  "devDependencies": {}
+}
+EOF
 
-bun install
-
-# Create demo page
 cat > index.html <<'EOF'
 <!doctype html>
 <html lang="en">
@@ -66,7 +74,6 @@ cat > src/main.js <<'EOF'
 console.log("DrupalForge demo template loaded successfully.");
 EOF
 
-# Ensure Vite builds to dist (safe)
 cat > vite.config.js <<'EOF'
 import { defineConfig } from 'vite'
 
@@ -78,17 +85,18 @@ export default defineConfig({
 })
 EOF
 
-# Build the app.
+echo
+echo "Install dependencies."
+bun install
+
 echo
 echo "Build Vite demo app."
 bun run build
 
-# Copy built files safely to /var/www/html (works even if not empty)
 echo
 echo "Copy build output to app root."
-cp -r dist/* . || true
+cp -r dist/* .
 
-# (Optional but clean) remove dist after copy
 rm -rf dist || true
 
 INIT_DURATION=$SECONDS
