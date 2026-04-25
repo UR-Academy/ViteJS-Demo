@@ -38,11 +38,10 @@ cat > package.json <<'EOF'
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "vite",
+    "build": "vite build",
     "dev": "vite --host 0.0.0.0"
   },
   "dependencies": {
-    "@vitejs/plugin-basic-ssl": "^2.1.0",
     "vite": "^7.0.0"
   },
   "devDependencies": {}
@@ -97,6 +96,8 @@ echo
 echo "Copy build output to app root."
 cp -r dist/* .
 
+echo
+echo "Clean build directory."
 rm -rf dist || true
 
 INIT_DURATION=$SECONDS
