@@ -1,0 +1,111 @@
+:root {
+  --primary: #7c3aed;
+  --secondary: #06b6d4;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, Arial, sans-serif;
+  color: white;
+  background:
+    radial-gradient(circle at top left, var(--secondary), transparent 35%),
+    linear-gradient(135deg, var(--primary), #111827 70%);
+  min-height: 100vh;
+}
+
+.page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 32px;
+}
+
+.hero {
+  width: min(960px, 100%);
+  padding: 48px;
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(14px);
+}
+
+.badge {
+  display: inline-block;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+h1 {
+  margin: 22px 0 12px;
+  font-size: clamp(40px, 7vw, 76px);
+  line-height: 0.95;
+}
+
+p {
+  font-size: 18px;
+  line-height: 1.6;
+  opacity: 0.9;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin: 28px 0;
+}
+
+button {
+  border: 0;
+  padding: 14px 20px;
+  border-radius: 14px;
+  color: #111827;
+  background: white;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin-top: 24px;
+}
+
+.card {
+  padding: 22px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.card h2 {
+  margin: 0 0 8px;
+}
+
+.card p {
+  margin: 0;
+  font-size: 15px;
+}
+
+@media (max-width: 760px) {
+  .hero {
+    padding: 28px;
+  }
+
+  .card-grid {
+    grid-template-columns: 1fr;
+  }
+}
