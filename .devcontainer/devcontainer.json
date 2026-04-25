@@ -1,12 +1,7 @@
 {
-    "name": "Drupal Forge Starter Template (PHP 8.5)",
+    "name": "ViteJS Demo",
     "dockerComposeFile": "docker-compose.yml",
     "service": "app",
-    "workspaceFolder": "/var/www/html",
-    "shutdownAction": "stopCompose",
-	"forwardPorts": [
-		80
-	],
-    "updateContentCommand": ".devpanel/init.sh",
-    "remoteUser": "www"
+    "workspaceFolder": "/usr/share/nginx/html",
+    "updateContentCommand": "bash .devpanel/init.sh"
 }

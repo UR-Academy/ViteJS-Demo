@@ -4,6 +4,8 @@ if [ -n "${DEBUG_SCRIPT:-}" ]; then
 fi
 set -eu -o pipefail
 
+APP_ROOT="${APP_ROOT:-/usr/share/nginx/html}"
+
 cd "$APP_ROOT"
 
 mkdir -p logs
@@ -11,11 +13,13 @@ LOG_FILE="logs/init-$(date +%F-%T).log"
 exec > >(tee "$LOG_FILE") 2>&1
 
 echo
-echo "Starting demo template setup..."
+echo "Starting Bun + Vite demo setup..."
 
 echo
-echo "Remove root-owned files."
-sudo rm -rf lost+found || true
+echo "Install required packages."
+if command -v apk >/dev/null 2>&1; then
+  apk add --no-cache bash curl unzip nodejs npm
+fi
 
 echo
 echo "Install Bun if needed."
@@ -60,7 +64,7 @@ cat > index.html <<'EOF'
     <main style="font-family: Arial, sans-serif; padding: 40px;">
       <h1>DrupalForge Demo Template</h1>
       <p>This demo page is running with Bun + Vite.</p>
-      <p>If you can see this page, the template setup is working.</p>
+      <p>If you can see this page, nginx is serving the built static files correctly.</p>
     </main>
     <script type="module" src="/src/main.js"></script>
   </body>
@@ -93,7 +97,7 @@ echo "Build Vite demo app."
 bun run build
 
 echo
-echo "Copy build output to app root."
+echo "Copy built files to nginx web root."
 cp -r dist/* .
 
 echo
