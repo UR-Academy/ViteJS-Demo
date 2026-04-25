@@ -1,0 +1,14 @@
+{
+  "name": "drupalforge-vite-demo",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite --host 0.0.0.0"
+  },
+  "dependencies": {
+    "vite": "^7.0.0"
+  },
+  "devDependencies": {}
+}
