@@ -3,77 +3,94 @@ if [ -n "${DEBUG_SCRIPT:-}" ]; then
   set -x
 fi
 set -eu -o pipefail
-cd $APP_ROOT
 
+cd "$APP_ROOT"
+
+mkdir -p logs
 LOG_FILE="logs/init-$(date +%F-%T).log"
-exec > >(tee $LOG_FILE) 2>&1
+exec > >(tee "$LOG_FILE") 2>&1
 
-TIMEFORMAT=%lR
-# For faster performance, don't audit dependencies automatically.
-export COMPOSER_NO_AUDIT=1
-# For faster performance, don't install dev dependencies.
-export COMPOSER_NO_DEV=1
-
-#== Remove root-owned files.
 echo
-echo Remove root-owned files.
-time sudo rm -rf lost+found
+echo "Starting demo template setup..."
 
-#== Composer install.
+# Remove root-owned files.
 echo
-if [ -f composer.json ]; then
-  if composer show --locked cweagans/composer-patches ^2 &> /dev/null; then
-    echo 'Update patches.lock.json.'
-    time composer prl
-    echo
-  fi
-else
-  echo 'Generate composer.json.'
-  time source .devpanel/composer_setup.sh
-  echo
-fi
-# If update fails, change it to install.
-time composer -n update --no-dev --no-progress
+echo "Remove root-owned files."
+sudo rm -rf lost+found || true
 
-#== Create the private files directory.
-if [ ! -d private ]; then
-  echo
-  echo 'Create the private files directory.'
-  time mkdir private
+# Install Bun if missing.
+echo
+echo "Install Bun if needed."
+if ! command -v bun >/dev/null 2>&1; then
+  curl -fsSL https://bun.sh/install | bash
 fi
 
-#== Create the config sync directory.
-if [ ! -d config/sync ]; then
-  echo
-  echo 'Create the config sync directory.'
-  time mkdir -p config/sync
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+
+bun --version
+
+# Create Vite demo app.
+echo
+echo "Create Vite demo app."
+
+if [ ! -f package.json ]; then
+  bun create vite . --template vanilla
 fi
 
-#== Install Drupal.
-echo
-if [ -z "$(drush status --field=db-status)" ]; then
-  echo 'Install Drupal.'
-  time drush -n si
+bun install
 
-  echo
-  echo 'Tell Automatic Updates about patches.'
-  drush -n cset --input-format=yaml package_manager.settings additional_trusted_composer_plugins '["cweagans/composer-patches"]'
-  time drush ev '\Drupal::moduleHandler()->invoke("automatic_updates", "modules_installed", [[], FALSE])'
-else
-  echo 'Update database.'
-  time drush -n updb
-fi
+# Create demo page
+cat > index.html <<'EOF'
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DrupalForge Demo Template</title>
+  </head>
+  <body>
+    <main style="font-family: Arial, sans-serif; padding: 40px;">
+      <h1>DrupalForge Demo Template</h1>
+      <p>This demo page is running with Bun + Vite.</p>
+      <p>If you can see this page, the template setup is working.</p>
+    </main>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
+EOF
 
-#== Warm up caches.
-echo
-echo 'Run cron.'
-time drush cron
-echo
-echo 'Populate caches.'
-time drush cache:warm &> /dev/null || :
-time .devpanel/warm
+mkdir -p src
 
-#== Finish measuring script time.
+cat > src/main.js <<'EOF'
+console.log("DrupalForge demo template loaded successfully.");
+EOF
+
+# Ensure Vite builds to dist (safe)
+cat > vite.config.js <<'EOF'
+import { defineConfig } from 'vite'
+
+export default defineConfig({
+  build: {
+    outDir: 'dist',
+    emptyOutDir: true
+  }
+})
+EOF
+
+# Build the app.
+echo
+echo "Build Vite demo app."
+bun run build
+
+# Copy built files safely to /var/www/html (works even if not empty)
+echo
+echo "Copy build output to app root."
+cp -r dist/* . || true
+
+# (Optional but clean) remove dist after copy
+rm -rf dist || true
+
 INIT_DURATION=$SECONDS
 INIT_HOURS=$(($INIT_DURATION / 3600))
 INIT_MINUTES=$(($INIT_DURATION % 3600 / 60))
